@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -13,10 +14,45 @@ public class Grid : MonoBehaviour
     public List<Tile> TilesListToBomb = new List<Tile>();
     public List<Tile> TilesList = new List<Tile>();
 
+    [SerializeField] private TextMeshProUGUI _timerText;
+    [SerializeField] private TextMeshProUGUI _bombNumberText;
+
     public int NBBombs;
+
+    public int FlagedBombs;
+    private int size;
+
+    public int RevealedTiles;
+
+    public bool IsGameStart = false;
+
+    private float _timer;
+
+    private void Update()
+    {
+        if (RevealedTiles == size - NBBombs)
+        {
+            foreach (var tile in TilesList)
+            {
+                tile._col.enabled = false;
+            }
+            IsGameStart = false;
+            _bombNumberText.text = "You \n Win !";
+        }
+        if (IsGameStart)
+        {
+            _timer += Time.deltaTime;
+            _timerText.text = _timer.ToString("000");
+            _bombNumberText.text = (NBBombs - FlagedBombs).ToString("000");
+        }
+    }
 
     public void NewGame(int width, int height)
     {
+        _timer = 0;
+        FlagedBombs = 0;
+        RevealedTiles = 0;
+        size = width * height;
         if (_grid != null)
         {
             Destroy(_grid);
@@ -39,7 +75,7 @@ public class Grid : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                Tile tile = Instantiate(_tilePrefab, new Vector3((x - width / 2f) + 0.5f, (y - height / 2f) + 0.5f), Quaternion.identity);
+                Tile tile = Instantiate(_tilePrefab, new Vector3((x - width / 2f) + 0.5f, (y - height / 2f) - 1f), Quaternion.identity);
                 tile.name = $"Tile{x}{y}";
                 tile.Position = new Vector2(x, y);
 
@@ -50,7 +86,6 @@ public class Grid : MonoBehaviour
                 TilesList.Add(tile);
             }
         }
-
         _grid.transform.localScale = new Vector3(0.5f, 0.5f);
     }
 
@@ -108,6 +143,8 @@ public class Grid : MonoBehaviour
 
     public void RevealAllBombs()
     {
+        IsGameStart = false;
+        _bombNumberText.text = "You \n Lose !";
         foreach (var tile in TilesList)
         {
             if (!tile.HasBomb && tile.IsFlaged)
@@ -125,7 +162,6 @@ public class Grid : MonoBehaviour
             {
                 tile.Reveal();
             }
-
             tile._col.enabled = false;
         }
     }

@@ -36,6 +36,7 @@ public class Tile : MonoBehaviour
         _symbolSR.sprite = null;
         IsRevealed = true;
         _tileSR.sprite = _revealed;
+        transform.parent.GetComponentInParent<Grid>().RevealedTiles++;
 
         if (IsFirstClick)
         {
@@ -43,6 +44,7 @@ public class Tile : MonoBehaviour
             var grid = transform.parent.GetComponentInParent<Grid>();
             grid.GetNearbyTiles();
             grid.TilesListToBomb.Remove(this);
+            grid.IsGameStart = true;
             foreach (Tile tile in grid.TilesListToBomb)
             {
                 tile.IsFirstClick = false;
@@ -132,12 +134,15 @@ public class Tile : MonoBehaviour
             {
                 _symbolSR.sprite = _flag;
                 IsFlaged = true;
+                transform.parent.GetComponentInParent<Grid>().FlagedBombs++;
+
             }
             else if (IsFlaged)
             {
                 _symbolSR.sprite = _questionMark;
                 IsQuestionMarked = true;
                 IsFlaged = false;
+                transform.parent.GetComponentInParent<Grid>().FlagedBombs--;
             }
             else if (IsQuestionMarked)
             {
