@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class UI : MonoBehaviour
+public class MSUI : MonoBehaviour
 {
-    [SerializeField] private Grid _grid;
+    [SerializeField] private MSGrid _msGrid;
 
     private int lastPlayed;
 
@@ -24,20 +24,21 @@ public class UI : MonoBehaviour
     }
     public void Easy()
     {
-        _grid.NewGame(8, 8);
-        _grid.NBBombs = 10;
+        _msGrid.NBBombs = 10;
+        _msGrid.NewGame(8, 8);
+
         lastPlayed = 1;
     }
     public void Medium()
     {
-        _grid.NewGame(16, 16);
-        _grid.NBBombs = 40;
+        _msGrid.NBBombs = 40;
+        _msGrid.NewGame(16, 16);
         lastPlayed = 2;
     }
     public void Expert()
     {
-        _grid.NewGame(32, 16);
-        _grid.NBBombs = 99;
+        _msGrid.NBBombs = 99;
+        _msGrid.NewGame(32, 16);
         lastPlayed = 3;
     }
     public void ToMenu()

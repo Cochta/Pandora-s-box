@@ -4,7 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public class MSTile : MonoBehaviour
 {
     [SerializeField] private Sprite _revealed;
     [SerializeField] private Sprite _bomb;
@@ -26,7 +26,7 @@ public class Tile : MonoBehaviour
 
     public bool IsRevealed = false;
 
-    public List<Tile> NearbyTiles;
+    public List<MSTile> NearbyTiles;
     public int NearbyBombs;
 
     public Vector2 Position;
@@ -36,20 +36,19 @@ public class Tile : MonoBehaviour
         _symbolSR.sprite = null;
         IsRevealed = true;
         _tileSR.sprite = _revealed;
-        transform.parent.GetComponentInParent<Grid>().RevealedTiles++;
 
         if (IsFirstClick)
         {
             HasBomb = false;
-            var grid = transform.parent.GetComponentInParent<Grid>();
+            var grid = transform.parent.GetComponentInParent<MSGrid>();
             grid.GetNearbyTiles();
             grid.TilesListToBomb.Remove(this);
             grid.IsGameStart = true;
-            foreach (Tile tile in grid.TilesListToBomb)
+            foreach (MSTile tile in grid.TilesListToBomb)
             {
                 tile.IsFirstClick = false;
             }
-            foreach (Tile tile in NearbyTiles)
+            foreach (MSTile tile in NearbyTiles)
             {
                 HasBomb = false;
                 grid.TilesListToBomb.Remove(tile);
@@ -61,17 +60,19 @@ public class Tile : MonoBehaviour
         if (HasBomb)
         {
             _symbolSR.sprite = _bomb;
-            transform.parent.GetComponentInParent<Grid>().RevealAllBombs();
+            transform.parent.GetComponentInParent<MSGrid>().RevealAllBombs();
 
         }
         else if (NearbyBombs == 0)
         {
             RevealNearby();
+            transform.parent.GetComponentInParent<MSGrid>().RevealedTiles++;
         }
         else
         {
             _numberText.text = NearbyBombs.ToString();
             SetColor();
+            transform.parent.GetComponentInParent<MSGrid>().RevealedTiles++;
         }
     }
 
@@ -99,7 +100,6 @@ public class Tile : MonoBehaviour
             {
                 tile.Reveal();
             }
-
         }
     }
 
@@ -134,7 +134,7 @@ public class Tile : MonoBehaviour
             {
                 _symbolSR.sprite = _flag;
                 IsFlaged = true;
-                transform.parent.GetComponentInParent<Grid>().FlagedBombs++;
+                transform.parent.GetComponentInParent<MSGrid>().FlagedBombs++;
 
             }
             else if (IsFlaged)
@@ -142,7 +142,7 @@ public class Tile : MonoBehaviour
                 _symbolSR.sprite = _questionMark;
                 IsQuestionMarked = true;
                 IsFlaged = false;
-                transform.parent.GetComponentInParent<Grid>().FlagedBombs--;
+                transform.parent.GetComponentInParent<MSGrid>().FlagedBombs--;
             }
             else if (IsQuestionMarked)
             {

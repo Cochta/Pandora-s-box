@@ -5,14 +5,14 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Grid : MonoBehaviour
+public class MSGrid : MonoBehaviour
 {
-    [SerializeField] private Tile _tilePrefab;
+    [SerializeField] private MSTile _msTilePrefab;
     private GameObject _grid;
 
-    private Dictionary<Vector2, Tile> _tiles;
-    public List<Tile> TilesListToBomb = new List<Tile>();
-    public List<Tile> TilesList = new List<Tile>();
+    private Dictionary<Vector2, MSTile> _tiles;
+    public List<MSTile> TilesListToBomb = new List<MSTile>();
+    public List<MSTile> TilesList = new List<MSTile>();
 
     [SerializeField] private TextMeshProUGUI _timerText;
     [SerializeField] private TextMeshProUGUI _bombNumberText;
@@ -42,13 +42,16 @@ public class Grid : MonoBehaviour
         if (IsGameStart)
         {
             _timer += Time.deltaTime;
-            _timerText.text = _timer.ToString("000");
             _bombNumberText.text = (NBBombs - FlagedBombs).ToString("000");
         }
+        _timerText.text = _timer.ToString("000");
+
     }
 
     public void NewGame(int width, int height)
     {
+        _bombNumberText.text = (NBBombs - FlagedBombs).ToString("000");
+        IsGameStart = false;
         _timer = 0;
         FlagedBombs = 0;
         RevealedTiles = 0;
@@ -64,26 +67,26 @@ public class Grid : MonoBehaviour
     private void GenerateGrid(int width, int height)
     {
         _grid = new GameObject();
-        _grid.name = "Grid";
+        _grid.name = "MSGrid";
         _grid.transform.parent = transform;
 
-        _tiles = new Dictionary<Vector2, Tile>();
-        TilesListToBomb = new List<Tile>();
-        TilesList = new List<Tile>();
+        _tiles = new Dictionary<Vector2, MSTile>();
+        TilesListToBomb = new List<MSTile>();
+        TilesList = new List<MSTile>();
 
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                Tile tile = Instantiate(_tilePrefab, new Vector3((x - width / 2f) + 0.5f, (y - height / 2f) - 1f), Quaternion.identity);
-                tile.name = $"Tile{x}{y}";
-                tile.Position = new Vector2(x, y);
+                MSTile msTile = Instantiate(_msTilePrefab, new Vector3((x - width / 2f) + 0.5f, (y - height / 2f) - 1f), Quaternion.identity);
+                msTile.name = $"MSTile{x}{y}";
+                msTile.Position = new Vector2(x, y);
 
-                tile.transform.parent = _grid.transform;
+                msTile.transform.parent = _grid.transform;
 
-                _tiles[new Vector2(x, y)] = tile;
-                TilesListToBomb.Add(tile);
-                TilesList.Add(tile);
+                _tiles[new Vector2(x, y)] = msTile;
+                TilesListToBomb.Add(msTile);
+                TilesList.Add(msTile);
             }
         }
         _grid.transform.localScale = new Vector3(0.5f, 0.5f);
@@ -95,9 +98,9 @@ public class Grid : MonoBehaviour
 
         for (int i = 0; i < nbBomb; i++)
         {
-            Tile tempTile = TilesListToBomb[rnd.Next(0, TilesListToBomb.Count)];
-            tempTile.HasBomb = true;
-            TilesListToBomb.Remove(tempTile);
+            MSTile tempMsTile = TilesListToBomb[rnd.Next(0, TilesListToBomb.Count)];
+            tempMsTile.HasBomb = true;
+            TilesListToBomb.Remove(tempMsTile);
         }
     }
 
@@ -115,7 +118,7 @@ public class Grid : MonoBehaviour
 
         foreach (var tile in TilesListToBomb)
         {
-            Tile value = tile; // envie de crever
+            MSTile value = tile; // envie de crever
             foreach (var target in targets)
             {
                 if (_tiles.TryGetValue(tile.Position + target, out value))
